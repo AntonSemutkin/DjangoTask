@@ -14,6 +14,12 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+class Ingridients(models.Model):
+    title = models.CharField(max_length=255, verbose_name='НазваниеИнгридиента')
+
+    def __str__(self):
+        return self.title
+
 class Dishes(models.Model): 
     class Meta:
         abstract = True
@@ -27,6 +33,21 @@ class Dishes(models.Model):
 
     def __str__(self):
         return self.title
+
+class Soups(Dishes):
+    weight = models.CharField(max_length=5, verbose_name='МассаБлюда')
+    calorie_content = models.CharField(max_length=255, verbose_name='КалорийностьБлюда')
+
+    def __str__(self):
+        return "{} :{}".format(self.category.name, self.title)
+
+class Drinks(Dishes):
+    weight = models.CharField(max_length=5, verbose_name='МассаНапитка')
+    type = models.CharField(max_length=255, verbose_name='ТипНапитка')
+    calorie_content = models.CharField(max_length=255, verbose_name='КалорийностьНапитка')
+
+    def __str__(self):
+        return "{} :{}".format(self.category.name, self.title)
 
 class CartDishes(models.Model):
     user = models.ForeignKey('Customer', verbose_name='Пользователь', on_delete=models.CASCADE)
