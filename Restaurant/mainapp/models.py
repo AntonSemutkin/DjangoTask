@@ -7,6 +7,20 @@ from django.utils import timezone
 
 User = get_user_model()
 
+
+class LatestDishesManager:
+    @staticmethod
+    def get_dishes_for_main_page(*args, **kwargs):
+        dishes = []
+        ct_models = ContentType.objects.filter(model__in=args)
+        for ct_model in ct_models:
+            model_dishes = ct_model.model_class()._base_manager.all().order_by('-id')[:3]
+            dishes.extend(model_dishes)
+        return dishes
+
+class LatestDishes:
+    objects = LatestDishesManager()
+
 class Category(models.Model):
     name = models.CharField(max_length=255, verbose_name='ИмяКатегории')
     slug = models.SlugField(unique=True)
