@@ -9,6 +9,12 @@ class DrinksAdmin(admin.ModelAdmin):
             return ModelChoiceField(Category.objects.filter(slug='drinks'))
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+class MainDishesAdmin(admin.ModelAdmin):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'category':
+            return ModelChoiceField(Category.objects.filter(slug='maindishes'))
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 class SoupsAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'category':
@@ -16,10 +22,9 @@ class SoupsAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-
 admin.site.register(Category)
-admin.site.register(Ingridients)
 admin.site.register(Soups, SoupsAdmin)
+admin.site.register(MainDishes, MainDishesAdmin)
 admin.site.register(Drinks, DrinksAdmin)
 admin.site.register(CartDishes)
 admin.site.register(Cart)

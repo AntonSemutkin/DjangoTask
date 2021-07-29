@@ -28,12 +28,6 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-class Ingridients(models.Model):
-    title = models.CharField(max_length=255, verbose_name='НазваниеИнгридиента')
-
-    def __str__(self):
-        return self.title
-
 class Dishes(models.Model): 
     class Meta:
         abstract = True
@@ -43,19 +37,26 @@ class Dishes(models.Model):
     slug = models.SlugField(unique=True)
     image = models.ImageField(verbose_name='Изображение')
     description = models.TextField(verbose_name='Описаниие', null=True)
-    price = models.DecimalField(max_digits=3, decimal_places=2, verbose_name="Цена")
+    price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="Цена")
 
     def __str__(self):
         return self.title
 
 class Soups(Dishes):
+    ingridients = models.CharField(max_length=255, verbose_name='Состав блюда')
     weight = models.CharField(max_length=5, verbose_name='МассаБлюда')
     calorie_content = models.CharField(max_length=255, verbose_name='КалорийностьБлюда')
 
     def __str__(self):
         return "{} :{}".format(self.category.name, self.title)
 
+class MainDishes(Dishes):
+    ingridients = models.CharField(max_length=255, verbose_name='Состав блюда')
+    weight = models.CharField(max_length=5, verbose_name='МассаБлюда')
+    calorie_content = models.CharField(max_length=255, verbose_name='КалорийностьБлюда')
+
 class Drinks(Dishes):
+    ingridients = models.CharField(max_length=255, verbose_name='Состав блюда')
     weight = models.CharField(max_length=5, verbose_name='МассаНапитка')
     type = models.CharField(max_length=255, verbose_name='ТипНапитка')
     calorie_content = models.CharField(max_length=255, verbose_name='КалорийностьНапитка')
