@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+        <section class="">
+            <div class="container px-4 px-lg-5 my-3">
+                <div class="row gx-4 gx-lg-5 align-items-top">
+                    <nav aria-label="breadcrumb mr-2 " class="mt-2">
+                        <ol class="breadcrumb">
+                          <li class="breadcrumb-item"><a href="{% url 'base' %}">Главная</a></li>
+                          <li class="breadcrumb-item"><a href="{{ dishes.category.get_absolute_url }}">{{ dishes.category.name }}</a></li>
+                          <li class="breadcrumb-item active" aria-current="page">{{ dishes.title }}</li>
+                        </ol>
+                      </nav>
+                    <div class="col-md-6"><img class="card-img-top mb-0 mb-md-0" src="{{ dishes.image.url }}" alt="..." /></div>
+                    <div class="col-md-6">
+                        <h1 class="display-5 fw-bolder">{{ dishes.title }}</h1>
+                        <p class="lead">{{ dishes.description }}</p>
+                        <div class="fs-6">
+                            {% if dishes.category.slug == 'drinks' %}
+                                {% include 'drinks_specification.html' %}
+                            {% elif dishes.category.slug == 'soups' %}
+                                {% include 'soups_specification.html' %}
+                            {% else %}
+                                {% include 'maindishes_specification.html' %}
+                            {% endif %}
+                        </div>
+                        <div class="d-flex">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock content %}
+

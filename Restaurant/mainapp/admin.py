@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.forms import ModelChoiceField 
+from django.forms import ModelChoiceField
 from .models import *
 
 

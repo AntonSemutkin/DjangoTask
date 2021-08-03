@@ -7,6 +7,10 @@ from django.utils import timezone
 
 User = get_user_model()
 
+def get_dishes_url(obj, viewname, urlpattern_name, model_name):
+    ct_model = obj.__class__._meta.model_name
+    return reverse(viewname, kwargs={'ct_model': ct_model, 'slug': obj.slug})
+
 
 class LatestDishesManager:
     @staticmethod
@@ -50,10 +54,19 @@ class Soups(Dishes):
     def __str__(self):
         return "{} :{}".format(self.category.name, self.title)
 
+    def get_absolute_url(self):
+        return get_dishes_url(self, 'dishes_detail')
+
 class MainDishes(Dishes):
     ingridients = models.CharField(max_length=255, verbose_name='Состав блюда')
     weight = models.CharField(max_length=5, verbose_name='МассаБлюда')
     calorie_content = models.CharField(max_length=255, verbose_name='КалорийностьБлюда')
+
+    def __str__(self):
+        return "{} :{}".format(self.category.name, self.title)
+
+    def get_absolute_url(self):
+        return get_dishes_url(self, 'dishes_detail')
 
 class Drinks(Dishes):
     ingridients = models.CharField(max_length=255, verbose_name='Состав блюда')
@@ -63,6 +76,9 @@ class Drinks(Dishes):
 
     def __str__(self):
         return "{} :{}".format(self.category.name, self.title)
+
+    def get_absolute_url(self):
+        return get_dishes_url(self, 'dishes_detail')
 
 class CartDishes(models.Model):
     user = models.ForeignKey('Customer', verbose_name='Пользователь', on_delete=models.CASCADE)
