@@ -10,7 +10,7 @@ User = get_user_model()
 def get_models_for_count(*model_names):
     return [models.Count(model_name) for model_name in model_names]
 
-def get_dishes_url(obj, viewname, urlpattern_name, model_name):
+def get_dishes_url(obj, viewname):
     ct_model = obj.__class__._meta.model_name
     return reverse(viewname, kwargs={'ct_model': ct_model, 'slug': obj.slug})
 
@@ -72,6 +72,9 @@ class Dishes(models.Model):
     def __str__(self):
         return self.title
 
+    def get_model_name(self):
+        return self.__class__.__name__.lower()
+
 class Soups(Dishes):
     ingridients = models.CharField(max_length=255, verbose_name='Состав блюда')
     weight = models.CharField(max_length=5, verbose_name='МассаБлюда')
@@ -113,26 +116,41 @@ class CartDishes(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     qty = models.PositiveIntegerField(default=1)
-    final_price = models.DecimalField(max_digits=3, decimal_places=2, verbose_name="ОбщаяЦена")
+    final_price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="ОбщаяЦена")
 
     def __str__(self):
         return 'Блюдо: {} (для корзины)'.format(self.content_object.title)
 
+    def save(self, *args, **kwargs):
+        self.final_price = self.qty * self.content_object.price
+        super().save(*args, **kwargs)
+
+
+
 class Cart(models.Model):
-    owner = models.ForeignKey("Customer", verbose_name='Владелец корзины', on_delete=models.CASCADE)
+    owner = models.ForeignKey("Customer", null=True, verbose_name='Владелец корзины', on_delete=models.CASCADE)
     dishes = models.ManyToManyField(CartDishes, blank=True, related_name='related_cart')
     total_dishes = models.PositiveIntegerField(default=0)
-    final_price = models.DecimalField(max_digits=3, decimal_places=2, verbose_name="ОбщаяЦена")
+    final_price = models.DecimalField(max_digits=6, decimal_places=2, default=0, verbose_name="ОбщаяЦена")
     in_order = models.BooleanField(default=False)
     for_anon_user = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.id)
 
+    def save(self, *args, **kwargs):
+        cart_data = self.dishes.aggregate(models.Sum('final_price'), models.Count('id'))
+        if cart_data.get('final_price__sum'):
+            self.final_price = cart_data['final_price__sum']
+        else:
+            self.final_price = 0
+        self.total_dishes = cart_data['id__count']
+        super().save(*args, **kwargs)
+
 class Customer(models.Model):
     user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
-    phone = models.CharField(max_length=20, verbose_name='номер телефона')
-    address = models.CharField(max_length=255, verbose_name='Адрес')
+    phone = models.CharField(max_length=20, null=True, blank=True, verbose_name='номер телефона')
+    address = models.CharField(max_length=255, null=True, blank=True, verbose_name='Адрес')
 
     def __str__(self):
         return "Покупатель: {} {}".format(self.user.first_name, self.user.last_name)
