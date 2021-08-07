@@ -40,7 +40,7 @@
             <form action="{% url 'change-qty' ct_model=item.content_object.get_model_name slug=item.content_object.slug %}" method="POST">
               {% csrf_token %}
               <input type="number" min="1" name="qty" value="{{ item.qty }}" class="form-control"><br>
-              <input type="submit" class="btn btn-primary mb-1" value="Изменить">
+              <input type="submit" class="btn btn-success btn-block mb-3" value="Изменить">
             </form>
             <a href="{% url 'remove-from-cart' ct_model=item.content_object.get_model_name slug=item.content_object.slug %}">
               <button class="btn btn-danger">Удалить</button>
@@ -53,9 +53,10 @@
     {% endfor %}
         <tr>
           <td colspan="2"></td>
-          <td>Итого:</td>
-          <td>{{ cart.total_dishes }}</td>
+          <td><strong>Итого:</strong></td>
+          <td><strong>{{ cart.total_dishes }}</strong></td>
           <td><strong>{{ cart.final_price }} BYN</strong></td>
+          <td><a href="{% url 'checkout' %}"><button class="btn btn-success btn-block mb-3">Оформить заказ<br></button></a></td>
         </tr>
   </tbody>
 </table>
